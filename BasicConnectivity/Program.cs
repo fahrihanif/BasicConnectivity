@@ -7,32 +7,43 @@ public class Program
 {
     private static void Main()
     {
-        var region = new Region();
-        
-        var getAllRegion = region.GetAll();
-
-        if (getAllRegion.Count > 0)
+        var choice = true;
+        while (choice)
         {
-            foreach (var region1 in getAllRegion)
-            {
-                Console.WriteLine($"Id: {region1.Id}, Name: {region1.Name}");
-            }
+            Console.WriteLine("1. List all regions");
+            Console.WriteLine("2. List all countries");
+            Console.WriteLine("3. List all locations");
+            Console.WriteLine("4. Exit");
+            Console.Write("Enter your choice: ");
+            var input = Console.ReadLine();
+            choice = Menu(input);
         }
-        else
+    }
+    public static bool Menu(string input)
+    {
+        switch (input)
         {
-            Console.WriteLine("No data found");
+            case "1":
+                var region = new Region();
+                var regions = region.GetAll();
+                GeneralMenu.List(regions, "regions");
+                break;
+            case "2":
+                var country = new Country();
+                var countries = country.GetAll();
+                GeneralMenu.List(countries, "countries");
+                break;
+            case "3":
+                var location = new Location();
+                var locations = location.GetAll();
+                GeneralMenu.List(locations, "locations");
+                break;
+            case "4": 
+                return false;
+            default:
+                Console.WriteLine("Invalid choice");
+                break;
         }
-
-        /*var insertResult = region.Insert("Region 5");
-        int.TryParse(insertResult, out int result);
-        if (result > 0)
-        {
-            Console.WriteLine("Insert Success");
-        }
-        else 
-        {
-            Console.WriteLine("Insert Failed");
-            Console.WriteLine(insertResult);
-        }*/
+        return true;
     }
 }

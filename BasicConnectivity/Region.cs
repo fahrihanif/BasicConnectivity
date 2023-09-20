@@ -1,22 +1,21 @@
-﻿using System.Data.SqlClient;
-
-namespace BasicConnectivity;
+﻿namespace BasicConnectivity;
 
 public class Region
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    
-    private readonly string connectionString =
-        "Data Source=CAMOUFLY;Integrated Security=True;Database=db_hr_dts;Connect Timeout=30;";
 
-    // GET ALL: Region
+    public override string ToString()
+    {
+        return $"{Id} - {Name}";
+    }
+
     public List<Region> GetAll()
     {
         var regions = new List<Region>();
 
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand();
+        using var connection = Provider.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection;
         command.CommandText = "SELECT * FROM regions";
@@ -43,8 +42,6 @@ public class Region
             }
             reader.Close();
             connection.Close();
-            
-            return new List<Region>();
         }
         catch (Exception ex)
         {
@@ -54,24 +51,53 @@ public class Region
         return new List<Region>();
     }
 
-    // GET BY ID: Region
     public Region GetById(int id)
     {
+        var region = new Region();
+        using var connection = Provider.GetConnection();
+        using var command = Provider.GetCommand();
+
+        command.Connection = connection;
+        command.CommandText = "SELECT * FROM regions where id = @id";
+        command.Parameters.Add(Provider.SetParameter("@id", id));
+
+        try
+        {
+            connection.Open();
+
+            using var reader = command.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                reader.Read();
+
+                region.Id = reader.GetInt32(0);
+                region.Name = reader.GetString(1);
+            }
+            reader.Close();
+            connection.Close();
+            
+            return region;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+
         return new Region();
     }
 
-    // INSERT: Region
-    public string Insert(string name)
+    public string Insert(Region region)
     {
-        using var connection = new SqlConnection(connectionString);
-        using var command = new SqlCommand();
+        using var connection = Provider.GetConnection();
+        using var command = Provider.GetCommand();
 
         command.Connection = connection;
         command.CommandText = "INSERT INTO regions VALUES (@name);";
 
         try
         {
-            command.Parameters.Add(new SqlParameter("@name", name));
+            command.Parameters.Add(Provider.SetParameter("@name", region.Name));
 
             connection.Open();
             using var transaction = connection.BeginTransaction();
@@ -98,13 +124,11 @@ public class Region
         }
     }
 
-    // UPDATE: Region
-    public string Update(int id, string name)
+    public string Update(Region region)
     {
         return "";
     }
 
-    // DELETE: Region
     public string Delete(int id)
     {
         return "";

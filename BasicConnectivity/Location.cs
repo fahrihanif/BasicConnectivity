@@ -34,10 +34,10 @@ public class Location
             {
                 while (reader.Read())
                 {
-                    locations.Add(new Location() {
+                    locations.Add(new Location {
                         Id = reader.GetInt32(0),
                         StreetAddress = reader.GetString(1),
-                        PostalCode = reader.GetString(2),
+                        PostalCode = reader.IsDBNull(2) ? "null" : reader.GetString(2),
                         City = reader.GetString(3),
                         StateProvince = reader.GetString(4),
                         CountryId = reader.GetString(5)

@@ -1,5 +1,5 @@
-﻿using System.Data;
-using System.Data.SqlClient;
+﻿using BasicConnectivity.Controllers;
+using BasicConnectivity.Views;
 
 namespace BasicConnectivity;
 
@@ -10,7 +10,7 @@ public class Program
         var choice = true;
         while (choice)
         {
-            Console.WriteLine("1. List all regions");
+            Console.WriteLine("1. Region CRUD");
             Console.WriteLine("2. List all countries");
             Console.WriteLine("3. List all locations");
             Console.WriteLine("4. List regions with Where");
@@ -27,25 +27,23 @@ public class Program
         switch (input)
         {
             case "1":
-                var region = new Region();
-                var regions = region.GetAll();
-                GeneralMenu.List(regions, "regions");
+                RegionMenu();
                 break;
             case "2":
                 var country = new Country();
                 var countries = country.GetAll();
-                GeneralMenu.List(countries, "countries");
+                //GeneralView.List(countries, "countries");
                 break;
             case "3":
                 var location = new Location();
                 var locations = location.GetAll();
-                GeneralMenu.List(locations, "locations");
+                //GeneralView.List(locations, "locations");
                 break;
             case "4":
                 var region2 = new Region();
-                string input2 = Console.ReadLine();
-                var result = region2.GetAll().Where(r => r.Name.Contains(input2)).ToList();
-                GeneralMenu.List(result, "regions");
+                //string input2 = Console.ReadLine();
+                //var result = region2.GetAll().Where(r => r.Name.Contains(input2)).ToList();
+                //GeneralView.List(result, "regions");
                 break;
             case "5":
                 var country3 = new Country();
@@ -71,8 +69,8 @@ public class Program
                                                  r => r.Id,
                                                  c => c.RegionId,
                                                  (r, c) => new { r, c })
-                                           .Join(getLocation, 
-                                                 rc => rc.c.Id, 
+                                           .Join(getLocation,
+                                                 rc => rc.c.Id,
                                                  l => l.CountryId,
                                                  (rc, l) => new RegionAndCountryVM {
                                                      CountryId = rc.c.Id,
@@ -82,12 +80,7 @@ public class Program
                                                      City = l.City
                                                  }).ToList();
 
-                /*foreach (var item in resultJoin2)
-                {
-                    Console.WriteLine($"{item.Id} - {item.NameRegion} - {item.NameCountry} - {item.RegionId}");
-                }*/
-
-                GeneralMenu.List(resultJoin2, "regions and countries");
+                //GeneralView.List(resultJoin2, "regions and countries");
                 break;
             case "10":
                 return false;
@@ -97,5 +90,43 @@ public class Program
         }
 
         return true;
+    }
+
+    public static void RegionMenu()
+    {
+        var region = new Region();
+        var regionView = new RegionView();
+               
+        var regionController = new RegionController(region, regionView);
+
+        var isLoop = true;
+        while (isLoop)
+        {
+            Console.WriteLine("1. List all regions");
+            Console.WriteLine("2. Insert new region");
+            Console.WriteLine("3. Update region");
+            Console.WriteLine("4. Delete region");
+            Console.WriteLine("10. Back");
+            Console.Write("Enter your choice: ");
+            var input2 = Console.ReadLine();
+            switch (input2)
+            {
+                case "1":
+                    regionController.GetAll();
+                    break;
+                case "2":
+                    regionController.Insert();
+                    break;
+                case "3":
+                    regionController.Update();
+                    break;
+                case "10":
+                    isLoop = false;
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
     }
 }
